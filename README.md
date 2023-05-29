@@ -9,6 +9,10 @@ Rendering to PDF tldr:
 
 ## General notes
 
+### Unified logging is important!
+
+See [logging][logging] guidelines for details.
+
 ### No hardcoded credentials
 
 Never hardcode usernames, passwords or other access tokens in any file
@@ -58,6 +62,7 @@ Remember to regularly check that your docker env also works.
 
 ## Specific notes and guidelines
 
+  - [logging][logging] guidelines
   - [git][git] guidelines
   - [C/C++][cpp] guidelines
   - [Rust][rust] guidelines
@@ -69,3 +74,4 @@ Remember to regularly check that your docker env also works.
 [cpp]: ./c_and_cpp.md
 [python]: ./python.md
 [rust]: ./rust.md
+[logging]: ./logging.md
