@@ -6,6 +6,7 @@ if [ "$#" -eq 0 ]; then
     --pdf-engine=wkhtmltopdf \
     --from gfm \
     README.md \
+    logging.md \
     git.md \
     ssh_tips.md \
     python.md \
