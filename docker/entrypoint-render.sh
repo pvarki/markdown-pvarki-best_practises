@@ -10,6 +10,7 @@ if [ "$#" -eq 0 ]; then
     git.md \
     ssh_tips.md \
     python.md \
+    databases.md \
     rust.md \
     c_and_cpp.md \
   && rm mermaid-filter.*
