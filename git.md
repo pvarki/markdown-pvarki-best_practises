@@ -2,6 +2,18 @@
 
 Git is very powerful, this also makes it sometimes a bit complicated.
 
+## _Always_ be rebasing
+
+Using `git merge` is **verboten** unless you **really** know what you are doing.
+
+Make sure your "pull" behaviour is rebase: `git config --global pull.rebase true`
+This avoids accidents when you forget to use the super-handy git-up tool (see below)
+
+Need to update your branch to be up-to-date with remote and main ? `git-up && git rebase main`
+
+`rebase -i` is your friend, see below.
+
+[See this post for more info][rebasehowto].
 
 ## Work in a branch
 
@@ -14,6 +26,7 @@ Git is very powerful, this also makes it sometimes a bit complicated.
 When making typo-fixes etc minor commits immediately squash them to
 a suitable previous commit (that has not yet been merged to a shared branch).
 
+[See this post for more info][rebasehowto].
 
 ## Use it for any and all code, documentation, etc
 
@@ -36,7 +49,7 @@ chunks instead of one giant "implemented these 10 different features".
 ## Use fetch-rebase not fetch-merge
 
 `git pull` does a fetch and then a merge commit, this will make your
-history very messy.
+history very messy. You can change this with `git config --global pull.rebase true`
 
 Use [`git-up`][gitup] to first fetch and then rebase your branches
 to their remote correspondents.
