@@ -10,11 +10,10 @@ Ubuntu you can use it on Windows thanks to [Windows Subsystem for Linux][wsl2].
 
 ## Use python3
 
-Use 3.7 as minimum version unless you absolutely positively have to.
+Use 3.9 as the bare minimum version.
 
-Use 3.6 as the minimum version if you can't go with 3.7+ for some reason.
-If 3.6 is the min version make sure more recent versions also work by
-using tox to run the test suite on them.
+Using 3.11 is recommended in general for everything that is not a library that must
+work with legacy things.
 
 ## Use virtualenv
 
