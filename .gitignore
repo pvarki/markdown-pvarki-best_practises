@@ -1,7 +1,0 @@
-# General good ideas to ignore
-.idea
-.git
-.cache
-.venv
-# the output file(s)
-*.pdf
