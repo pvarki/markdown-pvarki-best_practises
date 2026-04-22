@@ -39,6 +39,20 @@ It will also save a ton of work in the long term. If there's a deadline
 and you absolutely positively just have to do the copy-paste at least mark
 it with FIXME and create an issue to the repo about librarizing said code.
 
+#### Continuous Integration
+For any Continuous Integration (CI), make sure to add things to
+[config-ci-library](https://github.com/pvarki/config-ci-library), especially
+for things that are very likely reusable for other repos.
+
+#### Creating new repositories
+Likewise, when creating new repositories, make sure to use existing configs/
+templates from[config-ci-library](https://github.com/pvarki/config-ci-library).
+Changes to the config library are synced to template repositories, but drift is
+possible with pre-commit files, for example, once the initial repo is cloned. If
+there is no template for your specific use case, either use the existing configs
+to manually create one, or add one following the same conventions as for existing
+templates.
+
 ### Applications must be headless by default
 
 Unless the applications main purpose is to display graphics it must
