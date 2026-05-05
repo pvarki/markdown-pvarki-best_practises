@@ -1,7 +1,7 @@
 #0############
 # Run tests #
 #############
-FROM python:3.8-slim-buster as test
+FROM python:3.13-slim-bookworm AS test
 ENV \
   # locale
   LC_ALL=C.UTF-8 \
@@ -38,10 +38,10 @@ ENTRYPOINT ["/usr/bin/tini", "--", "docker/entrypoint-test.sh"]
 #0####################
 # deps for rendeding #
 ######################
-FROM test as render_build
+FROM test AS render_build
 RUN --mount=type=ssh curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
-    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get update \
     && apt-get install -y \
         pandoc \
@@ -54,5 +54,5 @@ RUN --mount=type=ssh curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key
     && true
 ENTRYPOINT ["/bin/bash", "-l"]
 
-FROM render_build as render
+FROM render_build AS render
 ENTRYPOINT ["/usr/bin/tini", "--", "docker/entrypoint-render.sh"]
