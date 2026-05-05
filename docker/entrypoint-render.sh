@@ -12,6 +12,7 @@ if [ "$#" -eq 0 ]; then
     python.md \
     databases.md \
     rust.md \
+    typescript.md \
     c_and_cpp.md \
   && rm mermaid-filter.*
 else
