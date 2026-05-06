@@ -81,6 +81,7 @@ Remember to regularly check that your docker env also works.
   - [C/C++][cpp] guidelines
   - [Rust][rust] guidelines
   - [Python][python] guidelines
+  - [TypeScript][typescript] guidelines
   - [SSH][ssh] pro tips
 
 [ssh]: ./ssh_tips.md
@@ -88,4 +89,5 @@ Remember to regularly check that your docker env also works.
 [cpp]: ./c_and_cpp.md
 [python]: ./python.md
 [rust]: ./rust.md
+[typescript]: ./typescript.md
 [logging]: ./logging.md
