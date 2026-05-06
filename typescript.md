@@ -42,7 +42,18 @@ It auto-formats your code to a common standard.
 ## Code-quality checks
 
 Use the [config-ci-library][cilib] pre-commit templates and run them locally
-with [prek][prek]. CI should run the same pre-commit checks using the action available.
+with [prek][prek]. CI should run the same pre-commit checks.
 
 [cilib]: https://github.com/pvarki/config-ci-library
 [prek]: https://github.com/j178/prek
+
+## CI actions
+
+[config-ci-library][cilib] provides reusable [composite actions][actions] to
+keep workflows short. Most useful for TypeScript projects:
+
+- `setup-typescript` — installs Node.js, pnpm, and dependencies with caching.
+- `validate-bumpversion` — check version bumps on release PRs.
+- `publish-image` — build and push the container image, if the project ships one.
+
+[actions]: https://github.com/pvarki/config-ci-library/tree/main/.github/actions
