@@ -67,6 +67,8 @@ contracts. Terse in chat; brief, plain commits and PRs.
 
 - Lint and format: `pre-commit run --all-files` (or `prek run --all-files`); CI runs the same through config-ci-library's general-check.
 - Hooks, once per clone: `prek install --hook-type pre-commit --hook-type commit-msg`
+- Harness check: `agents/check_harness.py`
+- Harness check tests: `python3 -B -m unittest discover -s tests`
 - PDF: `docker build --target render -t pvarki_best_practises:render . && docker run --rm -v "$PWD":/app pvarki_best_practises:render`
 
 ## Architecture & boundaries

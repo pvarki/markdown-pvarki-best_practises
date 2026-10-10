@@ -15,6 +15,18 @@ repos:
             entry: '^(co-authored-by:|([^\x00-\x7f]+ ?)?generated with )'
             args: [--ignore-case]
             stages: [commit-msg]
+        -   id: check-harness
+            name: check plugin manifests, skills and templates
+            language: script
+            entry: agents/check_harness.py
+            pass_filenames: false
+            always_run: true
+        -   id: test-harness
+            name: test the harness check
+            language: system
+            entry: python3 -B -m unittest discover -s tests
+            pass_filenames: false
+            always_run: true
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
