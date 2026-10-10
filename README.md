@@ -84,10 +84,10 @@ Remember to regularly check that your docker env also works.
   - [TypeScript][typescript] guidelines
   - [SSH][ssh] pro tips
 
-[ssh]: ./ssh_tips.md
-[git]: ./git.md
-[cpp]: ./c_and_cpp.md
-[python]: ./python.md
-[rust]: ./rust.md
-[typescript]: ./typescript.md
-[logging]: ./logging.md
+[ssh]: ./tools/ssh_tips.md
+[git]: ./tools/git.md
+[cpp]: ./frameworks-languages/c_and_cpp.md
+[python]: ./frameworks-languages/python.md
+[rust]: ./frameworks-languages/rust.md
+[typescript]: ./frameworks-languages/typescript.md
+[logging]: ./tools/logging.md

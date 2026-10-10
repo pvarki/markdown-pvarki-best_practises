@@ -6,14 +6,14 @@ if [ "$#" -eq 0 ]; then
     --pdf-engine=wkhtmltopdf \
     --from gfm \
     README.md \
-    logging.md \
-    git.md \
-    ssh_tips.md \
-    python.md \
-    databases.md \
-    rust.md \
-    typescript.md \
-    c_and_cpp.md \
+    tools/logging.md \
+    tools/git.md \
+    tools/ssh_tips.md \
+    frameworks-languages/python.md \
+    tools/databases.md \
+    frameworks-languages/rust.md \
+    frameworks-languages/typescript.md \
+    frameworks-languages/c_and_cpp.md \
   && rm mermaid-filter.*
 else
   exec "$@"

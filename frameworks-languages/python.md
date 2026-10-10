@@ -6,7 +6,7 @@ Also see the [Standard Environment setup][stdenv], even though it says
 Ubuntu you can use it on Windows thanks to [Windows Subsystem for Linux][wsl2].
 
 [stdenv]: ./ubuntu2004_python3_setup.md
-[wsl2]: ./win10_wsl2_docker.md
+[wsl2]: ../tools/win10_wsl2_docker.md
 
 ## Use python3
 
