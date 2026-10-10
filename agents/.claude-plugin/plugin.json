@@ -1,0 +1,16 @@
+{
+  "author": {
+    "name": "pvarki",
+    "url": "https://github.com/pvarki"
+  },
+  "description": "pvarki agent harness skills: adopt, best-practices, crown-jewels, review",
+  "homepage": "https://github.com/pvarki/markdown-pvarki-best_practises",
+  "keywords": [
+    "agents",
+    "harness",
+    "skills"
+  ],
+  "name": "pvarki",
+  "repository": "https://github.com/pvarki/markdown-pvarki-best_practises",
+  "version": "1.0.0"
+}
