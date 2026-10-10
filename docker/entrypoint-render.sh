@@ -16,6 +16,7 @@ if [ "$#" -eq 0 ]; then
     frameworks-languages/typescript.md \
     frameworks-languages/rust.md \
     frameworks-languages/c_and_cpp.md \
+    agents/README.md \
   && rm mermaid-filter.*
 else
   exec "$@"
