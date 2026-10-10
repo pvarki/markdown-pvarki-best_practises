@@ -2,7 +2,7 @@
 
 If you are on Windows, use [WSL2][wsl2] to run this stuff.
 
-[wsl2]: ../tools/win10_wsl2_docker.md
+[wsl2]: ../tools/win11_wsl2_docker.md
 
 ## One time preparation
 

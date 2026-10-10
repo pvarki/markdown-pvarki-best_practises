@@ -6,14 +6,12 @@ Also see the [Standard Environment setup][stdenv], even though it says
 Ubuntu you can use it on Windows thanks to [Windows Subsystem for Linux][wsl2].
 
 [stdenv]: ./ubuntu2004_python3_setup.md
-[wsl2]: ../tools/win10_wsl2_docker.md
+[wsl2]: ../tools/win11_wsl2_docker.md
 
-## Use python3
+## Use a supported Python
 
-Use 3.9 as the bare minimum version.
-
-Using 3.11 is recommended in general for everything that is not a library that must
-work with legacy things.
+3.11 is the bare minimum (3.9 and 3.10 are end-of-life). New projects use the
+newest stable release their dependencies support. Set it in `requires-python`.
 
 ## Use virtualenv
 
@@ -27,6 +25,13 @@ IDE just to get to your virtualenv.
 
 This is the official Python style. Black and pylint (see below) will
 help you with this.
+
+Don't underscore-prefix a local variable you use: a leading underscore marks
+one not used yet, and a bare `_` a value deliberately ignored. Module constants
+take no leading underscore.
+
+Group imports: stdlib (`from typing` imports first), then third-party, then
+the package's own modules as relative imports.
 
 [pep8]: https://www.python.org/dev/peps/pep-0008/
 
@@ -114,6 +119,14 @@ And keep it strict, see the minimal template above for good default config.
 And keep it strict. Type hinting will make future refactoring much safer
 and it will save you from a bunch of bugs right now as well.
 
+## Use Pydantic schemas
+
+Every API request and response is a Pydantic model, not an untyped dict,
+declared with `extra="forbid"` and with `Field(description=...)` on every
+field, so input is validated and the generated OpenAPI schema is complete. Use
+an Enum, not bare strings, for a closed set of options. Never set an attribute
+that the object's class does not declare.
+
 ## Use pyproject.toml
 
 This is the modern way to handle package metadata.
@@ -130,17 +143,26 @@ The modern packaging and dependency management tool.
 
     packagename = "^1.2.3"
 
-which lock the version to the minor version (only patch version can change)
-for poetry update, you probably want to lock only major version so change
-the version to `"^1.2"`.
+which allows any version from 1.2.3 up to, but not including, 2.0.0: the patch
+digit only raises the floor. Change it to `"^1.2"`; keep the patch digit only
+when you need a fix from that release, and name the fix in a comment.
+
+In PEP 621 metadata (`[project]`) write the same range as
+`"packagename>=1.2,<2"`. By default `uv add` writes only a lower bound
+(`"packagename>=1.2.3"`), so add the cap yourself.
+
+Write the interpreter bound as an explicit range with a comment on why that
+minimum:
+
+    requires-python = ">=3.11,<4.0"  # 3.11: oldest Python still supported
 
 ### Poetry git dependencies
 
-Make sure to use git tags for the dependencies::
+Pin git dependencies to a release commit, with its tag in a comment::
 
-    privatepackage = {git = "ssh://git@github.com/PVARKI-projekti/python-privatepackage", tag = "0.5.0"}
+    privatepackage = {git = "https://github.com/pvarki/python-privatepackage", rev = "<40-character commit sha>"}  # tag 0.5.0
 
 For development and testing purposes when you are developing the package you depend
 to at the same time you can also use `branch = "mybranch"` but before merging your
-changes to default branch make sure all git dependencies use tags (and remember to run
+changes to default branch make sure all git dependencies are pinned to a release commit (and remember to run
 `poetry update` to make sure the lockfile is up-to-date)
