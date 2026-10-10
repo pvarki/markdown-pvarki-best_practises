@@ -3,5 +3,6 @@
 .git
 .cache
 .venv
+.claude/worktrees/
 # the output file(s)
 *.pdf
