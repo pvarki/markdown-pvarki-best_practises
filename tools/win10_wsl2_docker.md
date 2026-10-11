@@ -1,5 +1,10 @@
 # Win 10 + WSL2 + Docker
 
+> Windows 10 has been out of support since 2025-10-14: use
+> [Win 11 + WSL2 + Docker](./win11_wsl2_docker.md). Linux GUI apps run through
+> WSL's built-in GUI support (WSLg); never run an X server with access control
+> disabled.
+
 A lot of good ideas stolen from <https://www.youtube.com/watch?v=idW-an99TAM>
 
 Since almost everything we do will at some point need to be deployed to production
@@ -37,32 +42,6 @@ setup with this version.
 Very handy terminal application with WSL and powershell integration, optional
 but highly recommended.
 
-## 4. Install X11 server
-
-<https://sourceforge.net/projects/vcxsrv/>
-
-  - Doubleclick on "XLaunch"
-  - Choose "Multiple windows" and set display number to 0, then click "Next"
-  - Choose "Start no client", click "Next"
-  - Check "Disable access control" and click "Next"
-  - Click on "Save configuration" and put the configuration file
-    to somplace where you can find it.
-  - Click "Finish"
-
-Next time you can just doubleclick on the configuration file,
-or you can put to your autostart directory to have X11 launch
-at login.
-
-## 5. Tell your Linux where the X11 server is
-
-Export the host display
-
-    echo 'export DISPLAY="$(/sbin/ip route | awk '"'"'/default/ { print $3 }'"'"'):0"' >>~/.profile
-
-Close and re-open the Linux shell (or `source ~/.profile`) and test X11 integration by running:
-
-    sudo apt-get install -y x11-apps && xeyes
-
 ## Map your Linux as a network drive
 
 In powershell run:
@@ -70,14 +49,14 @@ In powershell run:
      net use X: \\wsl$\Ubuntu-20.04 /PERSISTENT:YES
 
 
-## 6. Install Oh My ZSH on you Linux
+## 4. Install Oh My ZSH on you Linux
 
 <https://github.com/ohmyzsh/ohmyzsh>
 
 The best shell environment for UNIXen, once you start using this you won't go back. Optional
 but highly recommended.
 
-## 7. Get your SSH keys on the Linux
+## 5. Get your SSH keys on the Linux
 
 If you don't have keys generate them, see [SSH tips & tricks][sshtips].
 
@@ -107,7 +86,7 @@ life quality improvements to your setup.
 
 [sshtips]: ./ssh_tips.md
 
-## 8. Install Docker Desktop
+## 6. Install Docker Desktop
 
 <https://hub.docker.com/editions/community/docker-ce-desktop-windows>
 
@@ -116,7 +95,7 @@ your Linux.
 
 You can now test `docker run hello-world` in your Linux shell.
 
-## 9. Setup rest of your Linux dev environment
+## 7. Setup rest of your Linux dev environment
 
 See the documents for your relevant programming languages.
 
@@ -129,7 +108,7 @@ the mapped drive (see above) when opening the project in your Windows IDE.
 You can always run `explorer.exe .` in your WSL shell to get the directory
 opened on Windows.
 
-## 10. Configure your IDE to use the WSL for execution
+## 8. Configure your IDE to use the WSL for execution
 
 ### Python
 
@@ -141,7 +120,7 @@ at least you can get normal IDE features with correct modules available etc.
 
 [pycharmwsl]: https://www.jetbrains.com/help/pycharm/using-wsl-as-a-remote-interpreter.html
 
-Or you could always just run PyCharm under WSL itself since we have X11 integration set up,
+Or you could always just run PyCharm under WSL itself through WSLg,
 solves all the mapping headaches but the UI is following Linux standards, not Windows, some
 people prefer this.
 

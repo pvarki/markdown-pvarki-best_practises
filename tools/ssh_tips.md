@@ -1,7 +1,5 @@
 # Using `ssh-agent` nicely
 
-This document is maintained at <https://gitlab.com/advian/best_practises/>
-
 This is probably adaptable somehow to Windows but this
 document will only consider UNIX-like systems.
 
@@ -37,12 +35,21 @@ On WSL you might need to add `eval $(ssh-agent -s)` before
 the `ssh-add` command to have the agent available for
 you shell.
 
+## Jump hosts
+
+Use `ssh -J jumphost target`, or in `~/.ssh/config`:
+
+    Host target
+         ProxyJump jumphost
+
+The session to `target` runs end to end from your machine; your keys and
+agent never reach the jump host.
+
 ## Agent forwarding
 
-Use `ssh -A` (or see below for editing global config)
-to forward your auth agent so that you don't need to
-have your keys on every intermediate machine when
-connecting via jump servers or from local VMs etc.
+Avoid it. With `ssh -A`, anyone with root on the remote host can use your
+loaded keys while you are connected. Forward the agent only to a single host
+you fully trust, and never set `ForwardAgent yes` under `Host *`.
 
 ## Global config
 
@@ -50,8 +57,6 @@ Edit `~/.ssh/config` and add lines
 
     Host *
          ServerAliveInterval 30
-         ForwardAgent yes
 
-Which basically means that for all hosts enable agent
-forwarding and connection keepalive (some servers,
-especially AWS ones, are very quick to drop idle connections)
+This keeps idle connections alive (some servers, especially AWS ones, are
+very quick to drop idle connections).

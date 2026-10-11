@@ -1,0 +1,11 @@
+name: Checks
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  checks:
+    uses: pvarki/config-ci-library/.github/workflows/general-check.yml@1786399bf62c2b691f1e8fb9dcfc7a0be72a2846
+    with:
+      run-bumpversion: false

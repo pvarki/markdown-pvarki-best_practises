@@ -1,0 +1,20 @@
+-   id: pvarki-agent-files
+    name: check agent files against the pvarki harness
+    description: AGENTS.md rules block, CLAUDE.md import and Claude Code settings keep the harness release
+    entry: agents/check_harness.py --adopted
+    language: script
+    pass_filenames: false
+    always_run: true
+-   id: pvarki-no-attribution
+    name: reject AI attribution lines
+    entry: '^(co-authored-by:|([^\x00-\x7f]+ ?)?generated with )'
+    language: pygrep
+    args: [--ignore-case]
+    stages: [commit-msg]
+-   id: pvarki-no-local-settings
+    name: keep personal Claude settings out of git
+    description: .claude/settings.local.json is personal and overrides the project settings, so it must never be committed
+    entry: .claude/settings.local.json is personal; remove it from git
+    language: fail
+    files: (?i)(^|/)\.claude/settings\.local\.json$
+    types: []

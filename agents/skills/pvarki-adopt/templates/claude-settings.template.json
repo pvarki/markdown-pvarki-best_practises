@@ -1,0 +1,158 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
+  "enabledPlugins": {
+    "pvarki@pvarki": true
+  },
+  "extraKnownMarketplaces": {
+    "pvarki": {
+      "source": {
+        "ref": "1.0.0",
+        "source": "git",
+        "url": "https://github.com/pvarki/markdown-pvarki-best_practises.git"
+      }
+    }
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "continueOnBlock": true,
+            "prompt": "A coding agent wants to leave plan mode. The hook input is $ARGUMENTS; the plan is tool_input.plan. Allow only if the plan states all four: 1) the architecture layer it changes and any boundary it crosses, with the reason, or that it crosses none; 2) its security delta: new process execution, network egress, privileges, dependencies, auth, crypto or secrets, or none; 3) the ordered commits, one context each, with Conventional Commit subjects; 4) the commands that verify it. A small plan may be brief. Otherwise ok is false and the reason lists exactly what is missing.",
+            "type": "prompt"
+          }
+        ],
+        "matcher": "ExitPlanMode"
+      },
+      {
+        "hooks": [
+          {
+            "continueOnBlock": true,
+            "if": "Bash(git commit *)",
+            "prompt": "A coding agent may be about to run git commit. The hook input is $ARGUMENTS; the command is tool_input.command. If the command does not run git commit, allow. If the message is not in the command (editor, -F file, --fixup), allow. Otherwise allow only if: the subject is a Conventional Commit (type: summary, or type(scope): summary), at most 50 characters, imperative; a body, if any, explains why; there is no Co-authored-by or Generated with line; the command does not skip hooks (--no-verify, -n) or stage everything (-a, --all). Otherwise ok is false and the reason gives the fix.",
+            "type": "prompt"
+          },
+          {
+            "continueOnBlock": true,
+            "if": "Bash(gh pr create *)",
+            "prompt": "A coding agent may be about to open a pull request. The hook input is $ARGUMENTS; the command is tool_input.command. If the command does not run gh pr create, allow. Otherwise allow only if: it passes --draft; the title says what the change does; the body, where visible, follows the org PR template (a Description of what changed, why and which checks ran; the User-Facing Changes section has one ### entry per user-visible change between the releasenote markers, or is deleted, never left as the placeholder); there is no Co-authored-by or Generated with line. Do not block on parts you cannot see, such as --body-file. Otherwise ok is false and the reason says what to fix.",
+            "type": "prompt"
+          }
+        ],
+        "matcher": "Bash"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "prompt": "A coding agent is about to finish its turn. The hook input is $ARGUMENTS; read last_assistant_message. Judge only what this turn changed. If it changed no code or configuration, or stop_hook_active is true, allow. Otherwise allow only if the message names the checks that ran and their results, or says which were not run and why, and claims nothing it did not check. Otherwise ok is false and the reason says what to fix.",
+            "type": "prompt"
+          }
+        ]
+      }
+    ]
+  },
+  "outputStyle": "Concise",
+  "permissions": {
+    "ask": [
+      "Bash(git push *)",
+      "Bash(gh pr create *)",
+      "Bash(gh api *)",
+      "Bash(ssh *)",
+      "Bash(kubectl *)",
+      "Bash(dangerouslyDisableSandbox:true)"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(./**/secrets/**)",
+      "Edit(.venv/**)",
+      "Edit(node_modules/**)",
+      "Edit(./.claude/settings.json)",
+      "Edit(./.claude/settings.local.json)",
+      "Edit(./.mcp.json)",
+      "Edit(./.git/hooks/**)",
+      "Edit(./.git/config)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git commit --no-verify*)",
+      "Bash(gh pr merge *)",
+      "Bash(gh auth token*)",
+      "Bash(git commit * --no-verify*)",
+      "Bash(git commit -n*)",
+      "Bash(git commit * -n*)",
+      "Bash(git -C * commit *--no-verify*)",
+      "Bash(git -C * commit -n*)",
+      "Bash(git -C * commit * -n*)",
+      "Bash(git push * --force*)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.kube/**)",
+      "Read(~/.config/gh/**)",
+      "Read(~/.docker/config.json)",
+      "Read(~/.git-credentials)",
+      "Read(~/.netrc)",
+      "Read(~/.npmrc)",
+      "Read(~/.pypirc)",
+      "Read(~/.config/gcloud/**)",
+      "Read(~/.azure/**)",
+      "Read(~/.gnupg/**)"
+    ]
+  },
+  "sandbox": {
+    "credentials": {
+      "envVars": [
+        {
+          "mode": "deny",
+          "name": "GH_TOKEN"
+        },
+        {
+          "mode": "deny",
+          "name": "GITHUB_TOKEN"
+        },
+        {
+          "mode": "deny",
+          "name": "NPM_TOKEN"
+        },
+        {
+          "mode": "deny",
+          "name": "AWS_ACCESS_KEY_ID"
+        },
+        {
+          "mode": "deny",
+          "name": "AWS_SECRET_ACCESS_KEY"
+        },
+        {
+          "mode": "deny",
+          "name": "AWS_SESSION_TOKEN"
+        }
+      ]
+    },
+    "enabled": true,
+    "failIfUnavailable": true,
+    "filesystem": {
+      "denyWrite": [
+        "./.pre-commit-config.yaml",
+        "**/.venv",
+        "**/node_modules"
+      ]
+    },
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "api.github.com",
+        "codeload.github.com",
+        "objects.githubusercontent.com",
+        "raw.githubusercontent.com",
+        "pypi.org",
+        "files.pythonhosted.org",
+        "registry.npmjs.org"
+      ]
+    }
+  }
+}

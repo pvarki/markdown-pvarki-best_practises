@@ -1,17 +1,59 @@
-# Best practises
+# Best practices
 
-Coding standards etc documented.
+How pvarki builds software, for humans and for coding agents. Contribute with
+pull requests.
 
-Rendering to PDF tldr:
+## Responsibilities
+Ownership: OpenDefence Head of Engineering.
+- Heads and maintainers: Everything needed is here, and everything here is known.
+- Each of us: everything here is followed.
 
-    docker build --progress plain --ssh default --target render -t pvarki_best_practises:render .
-    docker run --rm -v `pwd`:/app pvarki_best_practises:render
+## Contents
 
-## General notes
+### [Rationality][rationality]: am I doing sane things?
+
+1. You Ain't Gonna Need It (YAGNI)
+2. Don't Repeat Yourself (DRY)
+3. Divide and conquer
+4. Validate with reality
+
+### [General practices](#general-practices): am I doing basic things in sane ways?
+
+1. Unified logging
+2. No hardcoded credentials
+3. UNIX newlines
+4. UTF-8
+5. Headless by default
+6. Docker(-compose) files
+
+### Tools: am I using tools in sane ways?
+
+- [git][git], including Conventional Commits
+- [CI and pre-commit][ci], with config-ci-library
+- [Logging][logging]
+- [Databases][databases]
+- [SSH][ssh]
+- [Windows 11, WSL2 and Docker][wsl11] (or [Windows 10][wsl10])
+
+### Frameworks and languages: am I using them sanely and so that others understand my work?
+
+- [Python][python], with an [Ubuntu setup][ubuntu]
+- [TypeScript][typescript]
+- [Rust][rust]
+- [C/C++][cpp]
+
+### [Agents][agents]: how coding agents work here
+
+Installable set of rules, guidance and skills for agents to work adhering the standards.
+You're welcomed to extend the Skills.
+
+---
+
+## General practices
 
 ### Unified logging is important!
 
-See [logging][logging] guidelines for details.
+See the [logging][logging] guidelines.
 
 ### No hardcoded credentials
 
@@ -29,29 +71,6 @@ your pre-commit hooks enforce this.
 
 or plain ASCII which UTF-8 is a superset of. No other encodings allowed,
 it will just lead to tears.
-
-### Don't Repeat Yourself (DRY)
-
-aka don't copy-paste code, refactor to helper methods and libraries.
-
-Yes, making a new library will take much longer in the short term.
-It will also save a ton of work in the long term. If there's a deadline
-and you absolutely positively just have to do the copy-paste at least mark
-it with FIXME and create an issue to the repo about librarizing said code.
-
-#### Continuous Integration
-For any Continuous Integration (CI), make sure to add things to
-[config-ci-library](https://github.com/pvarki/config-ci-library), especially
-for things that are very likely reusable for other repos.
-
-#### Creating new repositories
-Likewise, when creating new repositories, make sure to use existing configs/
-templates from[config-ci-library](https://github.com/pvarki/config-ci-library).
-Changes to the config library are synced to template repositories, but drift is
-possible with pre-commit files, for example, once the initial repo is cloned. If
-there is no template for your specific use case, either use the existing configs
-to manually create one, or add one following the same conventions as for existing
-templates.
 
 ### Applications must be headless by default
 
@@ -74,20 +93,22 @@ a `docker-compose.yml` that fires up a correctly initialized database.
 
 Remember to regularly check that your docker env also works.
 
-## Specific notes and guidelines
+## Rendering to PDF
 
-  - [logging][logging] guidelines
-  - [git][git] guidelines
-  - [C/C++][cpp] guidelines
-  - [Rust][rust] guidelines
-  - [Python][python] guidelines
-  - [TypeScript][typescript] guidelines
-  - [SSH][ssh] pro tips
+    docker build --progress plain --target render -t pvarki_best_practises:render .
+    docker run --rm -v `pwd`:/app pvarki_best_practises:render
 
-[ssh]: ./ssh_tips.md
-[git]: ./git.md
-[cpp]: ./c_and_cpp.md
-[python]: ./python.md
-[rust]: ./rust.md
-[typescript]: ./typescript.md
-[logging]: ./logging.md
+[rationality]: ./rationality/README.md
+[git]: ./tools/git.md
+[ci]: ./tools/ci.md
+[logging]: ./tools/logging.md
+[databases]: ./tools/databases.md
+[ssh]: ./tools/ssh_tips.md
+[wsl11]: ./tools/win11_wsl2_docker.md
+[wsl10]: ./tools/win10_wsl2_docker.md
+[python]: ./frameworks-languages/python.md
+[ubuntu]: ./frameworks-languages/ubuntu2004_python3_setup.md
+[typescript]: ./frameworks-languages/typescript.md
+[rust]: ./frameworks-languages/rust.md
+[cpp]: ./frameworks-languages/c_and_cpp.md
+[agents]: ./agents/README.md

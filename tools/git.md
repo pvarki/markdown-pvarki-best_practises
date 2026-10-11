@@ -36,7 +36,7 @@ There is nothing that is too small for starting with `git init`
 ## Commit early, commit often
 
 You can (and should) clean up the history with `git rebase -i` before
-marking merge-request as not WIP. Also `git push` often so random catastrophes
+marking the PR ready for review. Also `git push` often so random catastrophes
 affecting your working copy do not cause major loss of work.
 
 Smaller commits are better than large ones. Smaller commits make for
@@ -44,6 +44,25 @@ less chances of conflicts and easier resolving.
 
 It's way easier to review code when the commits are in small sensible
 chunks instead of one giant "implemented these 10 different features".
+
+
+## Use Conventional Commits
+
+Commit subjects follow [Conventional Commits][conventional]: `type(scope): subject`,
+where type is one of `feat fix docs refactor test ci build chore perf style revert`.
+Keep the subject imperative and short (50 characters, 72 at most) and use the
+body only for the why. Release notes are built from these subjects.
+
+Commits are authored by the person who makes them: no `Co-authored-by` or
+"Generated with" lines, not even from AI tools.
+
+The commit-msg hook from [config-ci-library][cicl] checks the subject format,
+but only once it is installed: `prek install --hook-type pre-commit --hook-type commit-msg`.
+No shared hook rejects `Co-authored-by` lines yet, so turn off your tools'
+co-author settings.
+
+[conventional]: https://www.conventionalcommits.org/
+[cicl]: https://github.com/pvarki/config-ci-library
 
 
 ## Use fetch-rebase not fetch-merge
@@ -59,8 +78,8 @@ to their remote correspondents.
 
 ## Rebase to main before merge
 
-**Rebase** (do *not* pull)  your branch to main regularly and always before marking merge-request as
-not WIP, at this time also look at your commit log and clean it up.
+**Rebase** (do *not* pull)  your branch to main regularly and always before marking the PR ready
+for review, at this time also look at your commit log and clean it up.
 [See this post for more info][rebasehowto].
 
 [rebasehowto]: https://thoughtbot.com/blog/git-interactive-rebase-squash-amend-rewriting-history
@@ -70,6 +89,10 @@ not WIP, at this time also look at your commit log and clean it up.
 
 Squash merges makes it difficult to work in multiple branches concurrently since
 it always does a history rewrite leading to conflicts that have to be manually resolved.
+
+They also replace your commits with one titled by the PR, which no hook checks,
+and the changelog that config-ci-library's release-notes action builds drops
+subjects that are not [Conventional Commits](https://www.conventionalcommits.org/).
 
 
 ## Default branch name
@@ -86,7 +109,7 @@ change it after the first commit (before pushing to remote repo that expects
 "main") with `git branch -m main`.
 
 
-## Do not `git add .` use `git commit -a`
+## Do not `git add .` or `git commit -a`
 
 The exception being the very first repo init.
 
@@ -95,9 +118,10 @@ sure that each time you do they only contain files you [really want][wannabe]
 in the repo. If unwanted files end up merged into the main branch (or some other
 shared branch) history they're in there forever unless very drastic measures are taken.
 
-The correct shorthand for "I want to commit all my changes" is `git commit -a`. Add
-any **new** files individually with git add (or let your IDE do it when you create the file
-via IDE).
+`git add -A` and `git commit -a` sweep in whatever an editor or formatter
+touched, such as line endings or submodule pointers. Instead run `git add <path>`
+for each file or submodule pointer you mean to commit, and check
+`git diff --staged` before committing.
 
 See also the note about large binary files below.
 
@@ -126,11 +150,16 @@ term used by Gitlab, many other places use PR.
 Make it early so you can get early feedback from the build and test automation
 of our CI pipelines.
 
-Prefix the title with "WIP:" to mark this request as being still work in
-progress so it won't be accidentally merged before it's done.
+Open it as a draft so it can't be merged before it's done, and fill in the
+[org PR template][prtemplate]. The user-facing release notes are built from
+its `releasenote` block: write one `###` entry per user-visible change, or
+delete the User-Facing Changes section.
 
-When you're actually done remove the WIP status and ask someone to review
-the merge request.
+When you're done, mark it ready for review and ask someone to review it.
+Approve only what you have read and, where it matters, run; otherwise
+comment instead of approving. Nobody merges a PR without an approval.
+
+[prtemplate]: https://github.com/pvarki/.github/blob/main/.github/pull_request_template.md
 
 Remember that small logical collections of features/fixes make for better
 MRs than huge dumps of anything and everything.
@@ -138,19 +167,19 @@ MRs than huge dumps of anything and everything.
 
 ## Use [pre-commit framework][precommit]
 
-This will make it easier to maintain high quality in your commits.
+Copy the generated config for your language from [config-ci-library][cicl]'s
+`pre-commit/configs/` to `.pre-commit-config.yaml` and add repo-specific
+hooks below its `END AUTOGENERATED SECTION` line.
 
-The various cookiecutter templates init the config for you but you must remember
-to run `pre-commit install` in your local checkout. To make you less likely to
-forget set up [automatic enable][precommitauto] on clone.
+Install prek once per machine (`uv tool install prek`), then in each clone run
+`prek install --hook-type pre-commit --hook-type commit-msg`. Plain
+`pre-commit install` or `prek install` installs only the pre-commit hook,
+because the generated configs don't set `default_install_hook_types`.
 
-
-For a minimal good configuration you can look at this repos
-[`.pre-commit-config.yaml`][configyaml]
+CI reruns the file checks through config-ci-library's general-check; it
+doesn't check commit messages yet.
 
 [precommit]: https://pre-commit.com/
-[configyaml]: ./.pre-commit-config.yaml
-[precommitauto]: https://pre-commit.com/#automatically-enabling-pre-commit-on-repositories
 
 
 ## Use `.gitignore`
@@ -167,6 +196,12 @@ To make sure you run the test suite before merging to main.
 ## Use semver
 
 [Semantic Versioning][semver], every merge to main must have unique version.
+
+Follow the repo's bump config. APIs and images we ship have a real version of
+at least 1.0.0, never `latest`, a missing version or 0.x. A CalVer date goes in
+SemVer build metadata (`1.2.3+YYMMDD`); image tags, which cannot contain `+`,
+use `1.2.3-YYMMDD`. The distribution repo, docker-rasenmaeher-integration, uses
+plain CalVer (`YYMMDD`).
 
 [semver]: https://semver.org/
 

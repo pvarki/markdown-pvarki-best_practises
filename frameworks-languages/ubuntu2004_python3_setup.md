@@ -2,7 +2,7 @@
 
 If you are on Windows, use [WSL2][wsl2] to run this stuff.
 
-[wsl2]: ./win10_wsl2_docker.md
+[wsl2]: ../tools/win11_wsl2_docker.md
 
 ## One time preparation
 
@@ -35,7 +35,7 @@ These are good to have available globally under your user
 
 See [SSH tips & tricks][sshtips] document.
 
-[sshtips]: ./ssh_tips.md
+[sshtips]: ../tools/ssh_tips.md
 
 ## For each project
 

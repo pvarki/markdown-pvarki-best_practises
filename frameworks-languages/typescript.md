@@ -53,7 +53,8 @@ with [prek][prek]. CI should run the same pre-commit checks.
 keep workflows short. Most useful for TypeScript projects:
 
 - `setup-typescript` — installs Node.js, pnpm, and dependencies with caching.
-- `validate-bumpversion` — check version bumps on release PRs.
+  Pass `node-version` explicitly; the default can lag behind the current LTS.
+- `validate-bumpversion` — fails a PR that doesn't bump the version in `.bumpversion.toml`.
 - `publish-image` — build and push the container image, if the project ships one.
 
 [actions]: https://github.com/pvarki/config-ci-library/tree/main/.github/actions
