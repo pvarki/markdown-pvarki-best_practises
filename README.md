@@ -74,6 +74,10 @@ a `docker-compose.yml` that fires up a correctly initialized database.
 
 Remember to regularly check that your docker env also works.
 
+Exception: ATAK plugins do not provide one. Their build needs the ATAK SDK,
+which may not be redistributed, so it cannot go into an image. The plugin's
+README documents the setup instead.
+
 ## Specific notes and guidelines
 
   - [logging][logging] guidelines
