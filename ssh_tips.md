@@ -1,7 +1,5 @@
 # Using `ssh-agent` nicely
 
-This document is maintained at <https://gitlab.com/advian/best_practises/>
-
 This is probably adaptable somehow to Windows but this
 document will only consider UNIX-like systems.
 
