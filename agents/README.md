@@ -136,6 +136,14 @@ run adopt again with the new tag.
     In bypass mode sandboxed commands can reach any host unless your user
     settings set `sandbox.network.strictAllowlist`; a repo can't set it.
   - Use it with auto mode for the fewest prompts.
+  - To turn it off for yourself in one clone, create
+    `.claude/settings.local.json` by hand with
+    `{"sandbox": {"enabled": false}}`. Your user settings can't do this,
+    because the repo's settings override them; local settings override the
+    repo's. Agents can't write that file (a deny rule), and
+    `pvarki-no-local-settings` keeps it out of git, so the sandbox stays on for
+    everyone else. Without it, shell commands can write anywhere and reach any
+    host; only the deny rules keep Claude's file tools away from credentials.
   - If the sandbox can't start, Claude Code won't start either: on Linux and
     WSL2 install `bubblewrap` and `socat`; native Windows has no sandbox, so
     use WSL2.
