@@ -12,7 +12,7 @@
       "source": "./agents"
     },
     {
-      "description": "Lazy senior dev mode (YAGNI, stdlib first); runs node hooks outside the sandbox. Pinned by sha",
+      "description": "Lazy senior dev mode (YAGNI, stdlib first); runs node hooks. Pinned by sha",
       "name": "ponytail",
       "source": {
         "sha": "0403c4dd50ee6d0db2c3ec70b2be6655f9cb65a9",

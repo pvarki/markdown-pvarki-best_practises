@@ -52,8 +52,7 @@
       "Bash(gh pr create *)",
       "Bash(gh api *)",
       "Bash(ssh *)",
-      "Bash(kubectl *)",
-      "Bash(dangerouslyDisableSandbox:true)"
+      "Bash(kubectl *)"
     ],
     "deny": [
       "Read(**/.env)",
@@ -91,56 +90,5 @@
       "Read(~/.azure/**)",
       "Read(~/.gnupg/**)"
     ]
-  },
-  "sandbox": {
-    "credentials": {
-      "envVars": [
-        {
-          "mode": "deny",
-          "name": "GH_TOKEN"
-        },
-        {
-          "mode": "deny",
-          "name": "GITHUB_TOKEN"
-        },
-        {
-          "mode": "deny",
-          "name": "NPM_TOKEN"
-        },
-        {
-          "mode": "deny",
-          "name": "AWS_ACCESS_KEY_ID"
-        },
-        {
-          "mode": "deny",
-          "name": "AWS_SECRET_ACCESS_KEY"
-        },
-        {
-          "mode": "deny",
-          "name": "AWS_SESSION_TOKEN"
-        }
-      ]
-    },
-    "enabled": true,
-    "failIfUnavailable": true,
-    "filesystem": {
-      "denyWrite": [
-        "./.pre-commit-config.yaml",
-        "**/.venv",
-        "**/node_modules"
-      ]
-    },
-    "network": {
-      "allowedDomains": [
-        "github.com",
-        "api.github.com",
-        "codeload.github.com",
-        "objects.githubusercontent.com",
-        "raw.githubusercontent.com",
-        "pypi.org",
-        "files.pythonhosted.org",
-        "registry.npmjs.org"
-      ]
-    }
   }
 }

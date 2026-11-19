@@ -85,7 +85,7 @@ contracts. Terse in chat; brief, plain commits and PRs.
 From the crown-jewels reviews of 2026-10-10; rerun `pvarki-crown-jewels` when this stops being true.
 
 - Release tags and `main`: every adopted repo loads the plugin and runs `check_harness.py` from them. Guarded by tag and branch rulesets and CODEOWNERS (owner action, pending).
-- The settings template and rules block: they set every adopter's sandbox, permissions and rules. Guarded by `check_harness.py` and review.
+- The settings template and rules block: they set every adopter's permissions, gates and rules. Guarded by `check_harness.py` and review.
 - `check_harness.py` and `.pre-commit-hooks.yaml`: code that runs in adopters' CI and on contributors' commits. Review as code; adopters pin it by commit.
 - The guides: every agent follows them. Guarded by review of the guides.
 
