@@ -22,7 +22,7 @@ MARKET_KEYS = {"$schema", "name", "description", "owner", "plugins"}
 ENTRY_KEYS = {"name", "source", "description", "version"}
 TEMPLATE_KEYS = {
     "claude-settings.template.json": {"attribution", "outputStyle", "extraKnownMarketplaces",
-                                      "enabledPlugins", "permissions", "hooks"},
+                                      "enabledPlugins", "sandbox", "permissions", "hooks"},
     "gemini-settings.template.json": {"context"},
     "copilot-settings.template.json": {"includeCoAuthoredBy"},
 }
@@ -98,6 +98,7 @@ def check(root):
         data = json.loads((templates / name).read_text())
         extra(data, allowed, name)
         extra(data.get("permissions", {}), PERMISSION_KEYS, f"{name} permissions")
+        extra(data.get("sandbox", {}), {"enabled", "failIfUnavailable", "filesystem", "network", "credentials"}, f"{name} sandbox")
         for event, groups in data.get("hooks", {}).items():
             kinds = {str(h.get("type")) for g in groups for h in g.get("hooks", [])}
             if kinds - {"prompt"}:
@@ -135,6 +136,7 @@ def check(root):
 
 ADOPTED_KEYS = TEMPLATE_KEYS["claude-settings.template.json"] | {"$schema"}
 PROMPT_HOOK_KEYS = {"type", "prompt", "if", "continueOnBlock", "timeout", "model"}
+HOSTNAME = re.compile(r"([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]([a-z0-9-]*[a-z0-9])?(:[0-9]{1,5})?")
 PROMPT_EVENTS = {"PreToolUse", "PostToolUse", "PostToolUseFailure", "PostToolBatch", "Stop", "SubagentStop",
                  "TaskCompleted", "TaskCreated", "TeammateIdle", "UserPromptExpansion", "UserPromptSubmit",
                  "PermissionDenied", "PermissionRequest"}
@@ -215,6 +217,22 @@ def check_adopted(repo, templates):
     permissions = obj(have.get("permissions", {}), "permissions", {"ask", "deny"})
     for key in ("ask", "deny"):
         strings(permissions.get(key, []), f"permissions.{key}", want["permissions"][key])
+    sandbox = obj(have.get("sandbox", {}), "sandbox", set(want["sandbox"]))
+    for key in ("enabled", "failIfUnavailable"):
+        if sandbox.get(key) is not True:
+            bad(f"sandbox.{key} must be true")
+    filesystem = obj(sandbox.get("filesystem", {}), "sandbox.filesystem", {"denyWrite"})
+    strings(filesystem.get("denyWrite", []), "sandbox.filesystem.denyWrite", want["sandbox"]["filesystem"]["denyWrite"])
+    network = obj(sandbox.get("network", {}), "sandbox.network", {"allowedDomains"})
+    for host in strings(network.get("allowedDomains", []), "sandbox.network.allowedDomains", []):
+        if not HOSTNAME.fullmatch(host):
+            bad(f"sandbox.network.allowedDomains: {host!r} is not an exact hostname")
+    env = obj(sandbox.get("credentials", {}), "sandbox.credentials", {"envVars"}).get("envVars", [])
+    if not (isinstance(env, list) and all(isinstance(e, dict) and set(e) == {"name", "mode"}
+                                          and isinstance(e["name"], str) and e["mode"] == "deny" for e in env)):
+        bad("sandbox.credentials.envVars must be a list of {name, mode: deny} entries")
+    elif [e for e in want["sandbox"]["credentials"]["envVars"] if e not in env]:
+        bad(f"sandbox.credentials.envVars lost {[e for e in want['sandbox']['credentials']['envVars'] if e not in env]}")
     hooks = have.get("hooks", {})
     if not isinstance(hooks, dict):
         bad("hooks must be an object")

@@ -87,7 +87,7 @@ class CheckHarnessTest(unittest.TestCase):
         self.assertFails("enabledPlugins: unexpected ['ponytail@pvarki']")
 
     def test_own_settings_drift_fails(self):
-        edit_json(self.root / ".claude/settings.json", lambda d: d["permissions"]["deny"].pop())
+        edit_json(self.root / ".claude/settings.json", lambda d: d["sandbox"].update(enabled=False))
         self.assertFails(".claude/settings.json: must match claude-settings.template.json")
 
     def test_template_command_hook_fails(self):
@@ -134,6 +134,7 @@ class CheckAdoptedTest(unittest.TestCase):
 
     def test_additions_pass(self):
         def add(d):
+            d["sandbox"]["network"]["allowedDomains"].append("pypi.example.org")
             d["permissions"]["deny"].append("Bash(rm -rf *)")
             d["hooks"]["Stop"].append({"hooks": [{"type": "prompt", "prompt": "Also check the changelog."}]})
         edit_json(self.settings, add)
@@ -152,9 +153,9 @@ class CheckAdoptedTest(unittest.TestCase):
         edit_json(self.settings, lambda d: d["permissions"]["deny"].remove("Bash(gh pr merge *)"))
         self.assertFails("permissions.deny lost")
 
-    def test_sandbox_block_fails(self):
-        edit_json(self.settings, lambda d: d.update(sandbox={"enabled": True}))
-        self.assertFails("keys the harness doesn't allow: ['sandbox']")
+    def test_sandbox_off_fails(self):
+        edit_json(self.settings, lambda d: d["sandbox"].update(enabled=False))
+        self.assertFails("sandbox.enabled must be true")
 
     def test_command_hook_fails(self):
         edit_json(self.settings, lambda d: d["hooks"]["Stop"].append({"hooks": [{"type": "command", "command": "true"}]}))
@@ -169,6 +170,9 @@ class CheckAdoptedTest(unittest.TestCase):
             "env": lambda d: d.update(env={"ANTHROPIC_BASE_URL": "https://proxy.example.com"}),
             "disableAllHooks": lambda d: d.update(disableAllHooks=True),
             "permissions.allow": lambda d: d["permissions"].update(allow=["Bash(*)"]),
+            "sandbox.excludedCommands": lambda d: d["sandbox"].update(excludedCommands=["git"]),
+            "sandbox.filesystem": lambda d: d["sandbox"]["filesystem"].update(allowWrite=["~/"]),
+            "allowedDomains": lambda d: d["sandbox"]["network"]["allowedDomains"].append("*"),
             "extraKnownMarketplaces": lambda d: d["extraKnownMarketplaces"].update(other={"source": {"source": "github", "repo": "x/y"}}),
             "enabledPlugins": lambda d: d["enabledPlugins"].update({"other@other": True}),
         }
@@ -181,6 +185,7 @@ class CheckAdoptedTest(unittest.TestCase):
     def test_malformed_settings_fail(self):
         cases = {
             "permissions.deny must be a list of strings": lambda d: d["permissions"].update(deny=" ".join(d["permissions"]["deny"])),
+            "envVars must be a list": lambda d: d["sandbox"]["credentials"].update(envVars="GITHUB_TOKEN"),
             "only prompt hooks": lambda d: d["hooks"]["Stop"].append({"hooks": "prompt"}),
         }
         for expected, change in cases.items():
@@ -189,14 +194,18 @@ class CheckAdoptedTest(unittest.TestCase):
                 edit_json(self.settings, change)
                 self.assertFails(expected)
         self.setUp()
-        self.settings.write_text(self.settings.read_text().replace('"sessionUrl": false', '"sessionUrl": NaN', 1))
+        self.settings.write_text(self.settings.read_text().replace('"enabled": true', '"enabled": NaN', 1))
         self.assertFails("not strict JSON")
 
 
 class CheckAdoptedEdgeTest(CheckAdoptedTest):
     def test_edge_cases_fail(self):
         cases = {
+            "not an exact hostname": lambda d: d["sandbox"]["network"]["allowedDomains"].append("169.254.169.254"),
             "attribution must equal": lambda d: d["attribution"].update(sessionUrl=0),
+            "sandbox.failIfUnavailable must be true": lambda d: d["sandbox"].update(failIfUnavailable=False),
+            "sandbox.network.allowLocalBinding": lambda d: d["sandbox"]["network"].update(allowLocalBinding=True),
+            "envVars must be a list": lambda d: d["sandbox"]["credentials"]["envVars"].append({"name": "X", "mode": "allow"}),
             "permissions.ask lost": lambda d: d["permissions"]["ask"].pop(),
             "only prompt hooks": lambda d: d["hooks"]["Stop"].append({"hooks": [{"type": "agent", "prompt": "x"}]}),
             "not an event that takes prompt hooks": lambda d: d["hooks"].update(SessionStart=[{"hooks": [{"type": "prompt", "prompt": "x"}]}]),

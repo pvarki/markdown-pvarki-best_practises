@@ -16,7 +16,7 @@ root.
 | `pvarki-crown-jewels` | Threat model or security review: crown jewels, attack paths, chokepoints | [skill][crown] |
 | `pvarki-review` | The review standard, built from what our reviewers reject | [skill][review] |
 | `pvarki-best-practices` | The org's standards: rationality, general practices, git, CI, logging, databases, Python, TypeScript, Rust, C/C++. Links to this repo's guides, no copies | [skill][bestpractices] |
-| Agent settings | Ask and deny rules, no attribution; Copilot and Gemini settings | [`templates/`][templates] |
+| Agent settings | Sandbox, ask and deny rules, no attribution; Copilot and Gemini settings | [`templates/`][templates] |
 | Guard | Keeps the plugin to reviewed text and prompt hooks; CI runs it | [`check_harness.py`][guard] |
 | Hooks | `pvarki-agent-files` keeps an adopted repo's rules block and Claude settings to the release; `pvarki-no-attribution` rejects AI attribution lines; `pvarki-no-local-settings` keeps personal settings out of git. Adopted repos add them to their config-ci-library pre-commit config, pinned by commit, and its CI runs them | [`.pre-commit-hooks.yaml`][hooks] |
 | Marketplace | The `pvarki` plugin, plus ponytail (opt-in, pinned by sha) | [`marketplace.json`][market] |
@@ -30,7 +30,7 @@ acts, and again where no agent can skip the check.
 |---|---|---|
 | Plans name the layer, boundary crossings, security delta, commits and checks | plan gate | review |
 | Conventional, brief commits without attribution; hooks never skipped | commit gate, deny rules | commit-msg hooks, including `pvarki-no-attribution`; CI doesn't check messages yet |
-| Agent files keep the harness: rules block, gates, deny rules | `pvarki-adopt` | `pvarki-agent-files`, run in CI by config-ci-library's `general-check`; what binds is code-owner review of `.claude/` and `.pre-commit-config.yaml` |
+| Agent files keep the harness: rules block, gates, sandbox, deny rules | `pvarki-adopt` | `pvarki-agent-files`, run in CI by config-ci-library's `general-check`; what binds is code-owner review of `.claude/` and `.pre-commit-config.yaml` |
 | Checks run and reported before "done" | finish gate | required CI checks |
 | Changes to what's worth protecting are called out; full security reviews on request | rules, the "Crown jewels" list in each `AGENTS.md` | `pvarki-review`; code owners |
 | Draft PRs from the org template, with release notes | PR gate | the PR template |
@@ -85,8 +85,8 @@ On claude.ai, zip a skill folder so the folder sits at the zip root
 Customize › Skills, or have an org owner provision it.
 
 Ponytail (lazy-senior-dev mode) is optional; its principles are already in the
-rules block. Its hooks run node at session start and on every prompt. To use it in one
-repo in Claude Code:
+rules block. Its hooks run node at session start and on every prompt, outside
+the sandbox. To use it in one repo in Claude Code:
 `claude plugin install ponytail@pvarki --scope local`.
 
 ## Adopt a repo
@@ -107,15 +107,61 @@ run adopt again with the new tag.
 - **Security reviews and threat models** start from what is worth protecting:
   `/pvarki-crown-jewels` ranks the crown jewels, maps the attack paths that
   reach them, verifies each path and fixes at the chokepoints.
+- **Sandbox (Claude Code).** The template turns the sandbox on:
+  - Shell commands run in OS isolation without prompts. Some fail inside it:
+    `git commit` with prek hooks and `uv run` (they write caches in your home
+    folder) and git over SSH (always on macOS; on Linux and WSL2 the template
+    hides `~/.ssh`). Retrying outside the sandbox always asks first, and that
+    one approval lifts the whole sandbox: read the command and `git diff`
+    before you give it. Never let the agent skip the hooks instead, and don't
+    add git to `excludedCommands`: excluded commands can reach any host.
+  - Files you run later outside the sandbox: Claude Code protects its own
+    config, `.git/hooks`, `.git/config`, `.vscode/` and `.idea/`, and the
+    template adds `.venv/` and `node_modules/`, so package installs run
+    outside the sandbox and ask first. On Linux and WSL2 the sandbox covers
+    only the top-level folders. Other ignored output, such as build folders,
+    isn't covered. Neither are tracked files: a commit, test, build or install
+    you approve outside the sandbox runs the agent's edits to hook scripts,
+    `conftest.py`, `package.json` scripts and build configs, and any
+    dependency it added, with your full access. Read `git diff` first.
+  - Credential files (`~/.ssh`, `~/.aws`, `~/.kube`, `~/.config/gh`,
+    `~/.docker/config.json`, `~/.git-credentials`, `~/.netrc`, `~/.npmrc`,
+    `~/.pypirc` and the gcloud, Azure and GnuPG folders) are blocked for
+    Claude's file tools and for sandboxed commands. `GH_TOKEN`,
+    `GITHUB_TOKEN`, `NPM_TOKEN` and the AWS key variables are removed from
+    sandboxed commands.
+  - The network is limited to GitHub and the public package registries; add
+    your repo's own indexes (e.g. a private PyPI) to `allowedDomains`. GitHub
+    stays reachable, so the sandbox narrows exfiltration; it doesn't prevent it.
+    In bypass mode sandboxed commands can reach any host unless your user
+    settings set `sandbox.network.strictAllowlist`; a repo can't set it.
+  - Use it with auto mode for the fewest prompts.
+  - If the sandbox can't start, Claude Code won't start either: on Linux and
+    WSL2 install `bubblewrap` and `socat`; native Windows has no sandbox, so
+    use WSL2.
 - **Keys that must always hold go in your user settings**
   (`~/.claude/settings.json`). A checkout can replace a repo's
   `.claude/settings.json`, and Claude Code reads it only when started at the
-  repo root. Copy the template's credential deny rules there at least.
+  repo root. At least:
+
+  ```json
+  {
+    "sandbox": {
+      "enabled": true,
+      "failIfUnavailable": true,
+      "network": { "strictAllowlist": true },
+      "credentials": { "envVars": [{ "name": "GITHUB_TOKEN", "mode": "deny" }] }
+    }
+  }
+  ```
+
+  Copy the template's `allowedDomains` there too, and add a deny entry for
+  every other token variable you export.
 - **Bypass mode** (`--dangerously-skip-permissions`) skips every permission
-  prompt and Claude Code's protected-path checks. The gates still block, and
-  the template's deny rules keep Claude's file tools out of credential files,
-  `.claude/settings*.json`, `.mcp.json`, `.git/hooks` and `.git/config`.
-  Shell commands are not confined: use it where a mistake can't reach
+  prompt and Claude Code's protected-path checks. The gates still block,
+  sandboxed commands stay sandboxed, and the template's deny rules keep
+  Claude's file tools out of `.claude/settings*.json`, `.mcp.json`,
+  `.git/hooks` and `.git/config`. Use it where a mistake can't reach
   credentials you care about.
 - **Credentials.** Agents act as whoever is logged in. Don't run agents under an
   account that can bypass branch protection or change repo settings. Use a

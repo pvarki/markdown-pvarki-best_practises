@@ -59,9 +59,12 @@ this skill's `templates/` folder: copy them, never retype the rules block
        a repo that already has them, give the human the new file to apply.
      - Set `ref` to the harness release tag you copied from.
      - Keys the template doesn't have (`permissions.allow`, `env`, `model`,
-       `sandbox`, extra plugin keys) aren't merged: the `pvarki-agent-files`
+       extra sandbox or plugin keys) aren't merged: the `pvarki-agent-files`
        hook rejects them. List them for the human as blocking; personal ones
        belong in that person's own `.claude/settings.local.json`.
+     - Add the repo's package indexes (`[[tool.uv.index]]` in `pyproject.toml`,
+       `.npmrc`, `pip.conf`) to `sandbox.network.allowedDomains`, and list them
+       for the human.
    - `.gemini/settings.json` from `templates/gemini-settings.template.json`.
    - `.github/copilot/settings.json` from `templates/copilot-settings.template.json`.
    - `.gitignore`: add `.claude/worktrees/`, where Claude Code puts worktrees.
